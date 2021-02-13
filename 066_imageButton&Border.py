@@ -1,0 +1,37 @@
+"""
+Tkinter - Codemy.com #66 : Image Buttons And Rounded Buttons
+Lien : https://www.youtube.com/watch?v=bVnKX0315lo&list=PLCC34OHNcOtoC6GglhF3ncJ5rLwQrLGnV&index=66
+
+Dans ce programme on créé un bouton à la forme d'une image et ne pas avoir la forme géométrique d'un bouton carré
+
+ATTENTION  : pour les images, ne prendre en compte que les fichiers au format .png. Avec une image avec le format .jpg,
+une erreur va s'afficher, il suffit donc de convertir le fichier au format .png.
+
+Éditeur : Laurent REYNAUD
+Date : 08-12-20
+"""
+
+from tkinter import *
+
+root = Tk()
+root.title('Mon titre !')
+root.geometry('400x400')
+
+
+def truc():
+    """Fonction permettant d'afficher le texte ci-après après avoir cliqué sur le bouton"""
+    my_label.config(text='Tu as cliqué sur le bouton...')
+
+
+"""Chargement de l'image"""
+login_btn = PhotoImage(file='Images/Login.png')
+
+"""Configuration d'un bouton à la forme d'une image et sans bordure"""
+my_button = Button(root, image=login_btn, borderwidth=0, command=truc)
+my_button.pack(pady=20)
+
+"""Configuration d'une étiquette"""
+my_label = Label(root, text='')
+my_label.pack(pady=20)
+
+root.mainloop()
