@@ -12,6 +12,26 @@ Date : 16-05-2021
 import tkinter
 from tkinter import ttk # widget combobox
 
+class Add:
+	"""La fonction add permet d'ajouter un widget sur un autre widget
+	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
+	index048_panedWindows
+	"""
+
+	def __init__(self, root):
+		self.root = root
+		self.widgets()
+
+	def widgets(self):
+		
+		# Configuration du panneau de fenêtre qui s'étendra sur toute la fenêtre
+		panel_1 = tkinter.PanedWindow(bd=4, relief='raised', bg='red')
+		panel_1.pack(fill='both', expand=1)  # extension sur toute la longueur et la largeur de la fenêtre
+
+		# Configuration du panneau haut à l'intérieur du panneau ci-avant
+		panel_2 = tkinter.PanedWindow(panel_1, orient='vertical', bd=4, relief='raised', bg='blue')
+		panel_1.add(panel_2)
+
 class Bind:
 	"""La fonction bind qui comprend deux arguments (<évènement>, action) permet d'intervenir sur un widget
 	en recourant aux touches du clavier ou à la souris
@@ -48,6 +68,8 @@ class Bind:
 class Config:
 	"""La fonction config() permet de modifier la saisie faite dans le widget
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
+	index061_listBox
+	index062_listBox&ScrollBars
 	"""
 
 	def __init__(self, root):
@@ -89,6 +111,39 @@ class Current:
 		self.myCombo.current(2)  # affichage par défaut : mercredi
 		self.myCombo.pack()
 
+class Curselection:
+
+	"""la fonction reversed permet de prendre d'un seul coup toutes les données 
+    électionnées. À défaut de cette instruction, les données à supprimer seront 
+    effacées une par une à chaque fois qu'on appuye sur le bouton concerné
+    Fonction retrouvée dans les cours suivants dans codemy_tkinter :
+	index062_listBox&ScrollBars"""
+
+	def __init__(self, root):
+		self.root = root
+		self.widgets()
+
+	def widgets(self):
+
+		self.my_listbox = tkinter.Listbox(root, justify='center', selectmode='multiple')
+		self.my_listbox.pack()
+
+		my_list = ['Un', 'Deux', 'Trois', 'Un', 'Deux', 'Trois', 'Un', 'Deux', 'Trois', 
+	        'Un', 'Deux', 'Trois', 'Un', 'Deux','Trois', 'Un', 'Deux', 'Trois', 'Un',
+	        'Deux', 'Trois']
+
+		for item in my_list:
+	        # insertion des données de la liste ci-dessus dans la zone de liste
+			self.my_listbox.insert('end', item)
+
+		my_button = tkinter.Button(root, text="Supprimer tout", command=self.delete_multiple)
+		my_button.pack()
+
+	def delete_multiple(self):
+
+		for item in reversed(self.my_listbox.curselection()):
+			self.my_listbox.delete(0, 'end')
+
 class Delete:
 	"""La fonction delete(0, 'end') permet d'effacer les données affichées dans le widget
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
@@ -102,6 +157,8 @@ class Delete:
 	index038_entry&Height
 	index041_removeLabels
 	index042_overwriteLabels
+	index061_listBox
+	index062_listBox&ScrollBars
 	"""
 
 	def __init__(self, root):
@@ -128,6 +185,7 @@ class Destroy:
 	index007_calculatrice
 	index023_dataBases
 	index042_overwriteLabels
+	index050_deleteFrameChildrenWidgets
 	"""
 
 	def __init__(self, root):
@@ -169,6 +227,8 @@ class Forget:
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index041_removeLabels
 	index042_overwriteLabels
+	index047_menus&Frame
+	index050_deleteFrameChildrenWidgets
 	"""
 
 	def __init__(self, root):
@@ -200,6 +260,7 @@ class Get:
 	index038_entry&Height
 	index042_overwriteLabels
 	index045_bindComboBox&OptionMenu
+	index061_listBox
 	"""
 
 	def __init__(self, root):
@@ -230,6 +291,8 @@ class Insert:
 	index007_calculatrice
 	index022_dataBases
 	index023_dataBases
+	index061_listBox
+	index062_listBox&ScrollBars
 	"""
 
 	def __init__(self, root):
@@ -252,6 +315,8 @@ class Quit:
 	"""La fonction 'quit' permet de quitter l'application
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index008_icon&quit
+	index047_menus&Frame
+	index050_deleteFrameChildrenWidgets
 	"""
 
 	def __init__(self, root):
@@ -309,9 +374,11 @@ class Set:
 
 if __name__ == '__main__':
 	root = tkinter.Tk()
+	# add = Add(root)
 	# bind = Bind(root)
 	# config = Config(root)
 	# current = Current(root)
+	curselection = Curselection(root)
 	# delete = Delete(root)
 	# destroy = Destroy(root)
 	# focus = Focus(root)
