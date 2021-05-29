@@ -1,5 +1,5 @@
 """
-Récapitulatif des fonctions préétablies dans tkinter
+Récapitulatif des fonctions natives dans tkinter
 
 Touches raccourcies :
 -> pour tout plier : CTRL + K + 1
@@ -16,6 +16,7 @@ class Add:
 	"""La fonction add permet d'ajouter un widget sur un autre widget
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index048_panedWindows
+	index064_noteBook
 	"""
 
 	def __init__(self, root):
@@ -70,6 +71,9 @@ class Config:
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index061_listBox
 	index062_listBox&ScrollBars
+	index063_config&Update
+	index065_multipleEntry
+	index066_imageButton&Border
 	"""
 
 	def __init__(self, root):
@@ -261,6 +265,7 @@ class Get:
 	index042_overwriteLabels
 	index045_bindComboBox&OptionMenu
 	index061_listBox
+	index065_multipleEntry
 	"""
 
 	def __init__(self, root):
@@ -282,6 +287,40 @@ class Get:
 		
 		insert = self.my_entry.get()
 		self.my_label.config(text=insert)
+
+class Hide:
+	"""La fonction hide() permet de cacher un onglet
+	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
+	index064_noteBook
+	"""
+
+	def __init__(self, root):
+		self.root = root
+		self.widgets()
+
+	def widgets(self):
+		
+		# Configuration des onglets
+		self.my_notebook = ttk.Notebook(root)
+		self.my_notebook.pack()
+
+        # Configuration des cadres"""
+		my_frame1 = tkinter.Frame(self.my_notebook, width=500, height=500, bg='blue')
+		my_frame1.pack(fill='both', expand=1)
+		my_frame2 = tkinter.Frame(self.my_notebook, width=500, height=500, bg='red')        
+		my_frame2.pack(fill='both', expand=1)
+
+        # Ajout des onglets
+		self.my_notebook.add(my_frame1, text='Onglet 1')
+		self.my_notebook.add(my_frame2, text='Onglet 2')
+
+        # bouton
+		my_button = tkinter.Button(my_frame1, text="Effacer l'onglet n° 2", command=self.hide_it)
+		my_button.pack()
+
+	def hide_it(self):
+		
+		self.my_notebook.hide(1)
 
 class Insert:
 	"""La fonction insert(0, argument) permet d'insérer des données dans le widget Entry
@@ -329,10 +368,12 @@ class Quit:
 		my_button.pack()
 
 class Select:
-	"""La fonction select() permet de cocher automatiquement la case dans le widget concerné et à l'inverse,
-	la fonction deselect() permet de décocher automatiquement la case
+	"""La fonction select() permet de sélectionner automatiquement la case / l'onglet
+	du widget concerné et à l'inverse,	la fonction deselect() permet de décocher 
+	automatiquement la case / l'onglet
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index017_checkBoxes
+	index064_noteBook
 	"""
 
 	def __init__(self, root):
@@ -378,12 +419,13 @@ if __name__ == '__main__':
 	# bind = Bind(root)
 	# config = Config(root)
 	# current = Current(root)
-	curselection = Curselection(root)
+	# curselection = Curselection(root)
 	# delete = Delete(root)
 	# destroy = Destroy(root)
 	# focus = Focus(root)
 	# forget = Forget(root)
 	# get = Get(root)
+	# hide = Hide(root)
 	# insert = Insert(root)
 	# quit = Quit(root)
 	# select = Select(root)
