@@ -39,6 +39,9 @@ class Bind:
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index044_bind
 	index045_bindComboBox&OptionMenu
+	index069_canvas&ArrowKeys
+	index070_canvas&ArrowKeys&Images
+	index071_canvas&Mouse&Images
 	"""
 
 	def __init__(self, root):
@@ -74,6 +77,8 @@ class Config:
 	index063_config&Update
 	index065_multipleEntry
 	index066_imageButton&Border
+	index067_entryAsInteger
+	index071_canvas&Mouse&Images
 	"""
 
 	def __init__(self, root):
@@ -266,6 +271,7 @@ class Get:
 	index045_bindComboBox&OptionMenu
 	index061_listBox
 	index065_multipleEntry
+	index067_entryAsInteger
 	"""
 
 	def __init__(self, root):
@@ -350,6 +356,81 @@ class Insert:
 		
 		self.my_entry.insert(0, e)
 
+class Move:
+	"""La fonction 'move' permet de déplacer un widget avec l'instruction bind
+	et les touches du clavier
+	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
+	index069_canvas&ArrowKeys
+	index070_canvas&ArrowKeys&Images
+	"""
+
+	def __init__(self, root):
+		self.root = root
+		self.widgets()
+
+	def widgets(self):
+
+		# Tailles et coordonnées en variables
+		w = 600
+		h = 400
+		x = w // 2
+		y = h // 2
+
+		# Configuration d'un canvas sous fond blanc
+		self.my_canvas = tkinter.Canvas(root, width=w, height=h, bg='white')
+		self.my_canvas.pack(pady=20)
+
+		# Configuration d'un cercle"""
+		self.my_circle = self.my_canvas.create_oval(x, y, x + 10, y + 10)
+
+		# Configuration des touches 'qsdz' du clavier pour déplacer le cercle
+		root.bind("<Key>", self.pressing)
+
+		# Configuration des touches directionnelles du clavier pour déplacer le cercle
+		root.bind('<Left>', self.left)
+		root.bind('<Right>', self.right)
+		root.bind('<Up>', self.up)
+		root.bind('<Down>', self.down)
+
+	def left(self, event):
+   			
+		# Déplacement de 10 pixels à la gauche
+		x = -10
+		y = 0
+		self.my_canvas.move(self.my_circle, x, y)
+
+	def right(self, event):
+        
+		# Déplacement de 10 pixels à la droite
+		x = 10
+		y = 0
+		self.my_canvas.move(self.my_circle, x, y)
+
+	def up(self, event):
+	    
+		# Déplacement de 10 pixels en haut
+		x = 0
+		y = -10
+		self.my_canvas.move(self.my_circle, x, y)
+
+	def down(self, event):
+	    
+		# Déplacement de 10 pixels en bas
+		x = 0
+		y = 10
+		self.my_canvas.move(self.my_circle, x, y)
+
+	def pressing(self, event):
+	   
+		# Déplacement avec les touches 'qsdz'
+		x = 0
+		y = 0
+		if event.char == 'q': x = -10  # déplacement à gauche
+		if event.char == 's': y = 10  # déplacement en bas
+		if event.char == 'd': x = 10  # déplacement à droite
+		if event.char == 'z': y = -10  # déplacement en haut
+		self.my_canvas.move(self.my_circle, x, y)
+
 class Quit:
 	"""La fonction 'quit' permet de quitter l'application
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
@@ -427,6 +508,7 @@ if __name__ == '__main__':
 	# get = Get(root)
 	# hide = Hide(root)
 	# insert = Insert(root)
+	# move = Move(root)
 	# quit = Quit(root)
 	# select = Select(root)
 	# set = Set(root)
