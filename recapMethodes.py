@@ -11,6 +11,7 @@ Date : 16-05-2021
 
 import tkinter
 from tkinter import ttk # widget combobox
+import time
 
 class Add:
 	"""La fonction add permet d'ajouter un widget sur un autre widget
@@ -33,6 +34,49 @@ class Add:
 		panel_2 = tkinter.PanedWindow(panel_1, orient='vertical', bd=4, relief='raised', bg='blue')
 		panel_1.add(panel_2)
 
+class After:
+    """La fonction after permet de mettre à jour un widget
+	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
+	index079_timeLocale
+	"""
+    
+    def __init__(self, root):
+        self.root = root
+        self.widgets()
+        self.clock()
+    
+    def widgets(self):
+        
+        """Configuration étiquette résultat (temps actuel)"""
+        self.my_label = tkinter.Label(root, text='', font='Helvetica 48', fg='green', bg='black')
+        self.my_label.pack(pady=20)
+
+        """Configuration d'une deuxième étiquette (date actuelle)"""
+        self.my_label2 = tkinter.Label(root, text='', font='Helvetica 14')
+        self.my_label2.pack(pady=10)
+        
+    def clock(self):
+        """Affichage de l'heure : minute : seconde actuelles :
+        -> On déclare les variables de temps avec l'instruction strftime()
+        -> L'étiquette résultat affiche le temps actuelle grâce à l'instruction config()
+        -> Mise à jour de l'étiquette avec l'instruction after() 
+        avec pour arguments le temps en millisecondes et 
+        une fonction récursive (fonction s'appelant elle-même)"""
+        
+        hour = time.strftime("%H")
+        minute = time.strftime("%M")
+        second = time.strftime("%S")
+        day = time.strftime("%A")
+        numb_day = time.strftime("%e")
+        month = time.strftime("%B")
+        year = time.strftime("%Y")
+        # affichage du temps actuel
+        self.my_label.config(text=hour + ':' + minute + ':' + second)
+        # mise à jour du temps avec en arguments : temps en millisecondes, fonction  
+        self.my_label.after(1000, self.clock)  
+        # affichage de la date actuelle
+        self.my_label2.config(text=day + ' ' + numb_day + ' ' + month + ' ' + year)   
+
 class Bind:
 	"""La fonction bind qui comprend deux arguments (<évènement>, action) permet d'intervenir sur un widget
 	en recourant aux touches du clavier ou à la souris
@@ -42,6 +86,9 @@ class Bind:
 	index069_canvas&ArrowKeys
 	index070_canvas&ArrowKeys&Images
 	index071_canvas&Mouse&Images
+	index075_mouse&Images
+	index085_mouseColorButtonPopupMessage
+	index096_fullScreenScrollBar
 	"""
 
 	def __init__(self, root):
@@ -79,6 +126,12 @@ class Config:
 	index066_imageButton&Border
 	index067_entryAsInteger
 	index071_canvas&Mouse&Images
+	index072_calendar
+	index074_OS
+	index075_mouse&Images
+	index079_timeLocale
+	index085_mouseColorButtonPopupMessage
+	index097_threads
 	"""
 
 	def __init__(self, root):
@@ -272,6 +325,7 @@ class Get:
 	index061_listBox
 	index065_multipleEntry
 	index067_entryAsInteger
+ 	index080_resizeWindow
 	"""
 
 	def __init__(self, root):
@@ -497,6 +551,7 @@ class Set:
 if __name__ == '__main__':
 	root = tkinter.Tk()
 	# add = Add(root)
+	# after = After(root)
 	# bind = Bind(root)
 	# config = Config(root)
 	# current = Current(root)
