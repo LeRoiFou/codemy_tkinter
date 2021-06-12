@@ -132,6 +132,8 @@ class Config:
 	index079_timeLocale
 	index085_mouseColorButtonPopupMessage
 	index097_threads
+	index098_spinboxes
+	index099_textBox
 	"""
 
 	def __init__(self, root):
@@ -221,6 +223,7 @@ class Delete:
 	index042_overwriteLabels
 	index061_listBox
 	index062_listBox&ScrollBars
+	index099_textBox
 	"""
 
 	def __init__(self, root):
@@ -326,6 +329,8 @@ class Get:
 	index065_multipleEntry
 	index067_entryAsInteger
  	index080_resizeWindow
+	index098_spinboxes
+	index099_textBox
 	"""
 
 	def __init__(self, root):
@@ -392,6 +397,7 @@ class Insert:
 	index023_dataBases
 	index061_listBox
 	index062_listBox&ScrollBars
+	index100_textBoxFiledialog
 	"""
 
 	def __init__(self, root):
