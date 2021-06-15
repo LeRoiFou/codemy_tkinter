@@ -11,6 +11,7 @@ Date : 16-05-2021
 
 import tkinter
 from tkinter import ttk # widget combobox
+from tkinter import font # police d'écriture
 import time
 
 class Add:
@@ -134,6 +135,7 @@ class Config:
 	index097_threads
 	index098_spinboxes
 	index099_textBox
+	index102_textBoxBoldItalics
 	"""
 
 	def __init__(self, root):
@@ -387,8 +389,32 @@ class Hide:
 		
 		self.my_notebook.hide(1)
 
+	"""La fonction index('insert') permet d'insérer une image là où se trouve
+	le curseur de la souris
+	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
+	index101_textBoxImagesScrollBar
+	"""
+
+	def __init__(self, root):
+		self.root = root
+		self.widgets()
+
+	def widgets(self):
+		
+		self.my_text = tkinter.Text(root)
+		self.my_text.pack()
+
+		my_button = tkinter.Button(root, text="Insérer", command=self.func_index)
+		my_button.pack()
+
+	def func_index(self):
+		
+		# position = self.my_text.index('insert')
+		self.my_text.insert('end', 'e')
+
 class Insert:
 	"""La fonction insert(0, argument) permet d'insérer des données dans le widget Entry
+	Pour le widget Text la fonction est insert('end', argument)
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index005_calculatrice
 	index006_calculatrice
@@ -398,6 +424,8 @@ class Insert:
 	index061_listBox
 	index062_listBox&ScrollBars
 	index100_textBoxFiledialog
+	index101_textBoxImagesScrollBar
+	index102_textBoxBoldItalics
 	"""
 
 	def __init__(self, root):
@@ -527,6 +555,33 @@ class Select:
 		check.select()
 		check.pack()
 
+class SelectionGet:
+    """La fonction selection_get() permet de sélectionner un texte ou une partie
+    du texte dans le widget text et dans l'exemple ci-dessous, de l'afficher
+	index102_textBoxBoldItalics
+	"""
+    
+    def __init__(self, root):
+        self.root = root
+        self.widgets()
+        
+    def widgets(self):
+        
+        self.my_text = tkinter.Text(root, width=40, height=5,)
+        self.my_text.pack()
+        
+        my_button = tkinter.Button(root, text="Sélectionner", command=self.select_it)
+        my_button.pack()
+        
+        self.my_label = tkinter.Label(root, text="")
+        self.my_label.pack()
+        
+    def select_it(self):
+        "Méthode affichant le texte sélectionné dans le widget Text"
+        
+        my_select = self.my_text.selection_get()
+        self.my_label.config(text=my_select)
+
 class Set:
 	"""La fonction set() permet de modifier le texte affiché et il est utilisé surtout avec le widget Label
 	en recourant aux variables de contrôles
@@ -554,6 +609,71 @@ class Set:
 
 		self.my_labelVar.set("Le texte a été modifié !!!")
 
+class Tag:
+    """La fonction tag() permet de modifier la mise en forme de la police d'écriture
+    dans le widget Text
+	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
+	index102_textBoxBoldItalics
+	"""
+    
+    def __init__(self, root):
+        self.root = root
+        self.widgets()
+        
+    def widgets(self):
+        
+        self.my_text = tkinter.Text(root, width=40, 
+                                    height=5, 
+                                    font="Helvetica 20",
+                                    selectbackground='blue')
+        self.my_text.grid(row=0, column=0, columnspan=2)
+        
+        my_button_bold = tkinter.Button(root, text="Gras", command=self.bold_it)
+        my_button_bold.grid(row=1, column=0)
+        
+        my_button_italic = tkinter.Button(root, text="Italique", command=self.italic_it)
+        my_button_italic.grid(row=1, column=1)  
+        
+    def bold_it(self):
+        "Police d'écriture en gras"
+        
+        # Récupération de la police d'écriture
+        bold_font = font.Font(self.my_text, self.my_text.cget('font'))  
+        
+        # Configuration pour la mise en gras de l'écriture
+        bold_font.config(weight='bold') 
+        self.my_text.tag_config('bold', font=bold_font)
+        
+        # Caractères sélectionnés
+        current_tags = self.my_text.tag_names('sel.first')
+        if 'bold' in current_tags:
+            """Si le texte est déjà en gras... 
+            supprimer cette mise en forme"""
+            self.my_text.tag_remove('bold', 'sel.first', 'sel.last')
+        else:
+            """sinon ajouter cette mise en forme"""
+            self.my_text.tag_add('bold', 'sel.first', 'sel.last')   
+    
+    def italic_it(self):
+        "Police d'écriture en italique"
+        
+        # Récupération de la police d'écriture
+        italic_font = font.Font(self.my_text, self.my_text.cget('font'))  
+        
+        # Configuration pour la mise en gras de l'écriture
+        italic_font.config(slant='italic') 
+        self.my_text.tag_config('italic', font=italic_font)
+        
+        # Caractères sélectionnés
+        current_tags = self.my_text.tag_names('sel.first')
+        if 'italic' in current_tags:
+            """Si le texte est déjà en italique... 
+            supprimer cette mise en forme"""
+            self.my_text.tag_remove('italic', 'sel.first', 'sel.last')
+        else:
+            """sinon ajouter cette mise en forme"""
+            self.my_text.tag_add('italic', 'sel.first', 'sel.last') 
+
 if __name__ == '__main__':
 	root = tkinter.Tk()
 	# add = Add(root)
@@ -572,5 +692,7 @@ if __name__ == '__main__':
 	# move = Move(root)
 	# quit = Quit(root)
 	# select = Select(root)
+	# selection_get = SelectionGet(root)
 	# set = Set(root)
+	# tag = Tag(root)
 	root.mainloop()
