@@ -10,7 +10,7 @@ Date : 16-05-2021
 """
 
 import tkinter
-from tkinter import ttk # widget combobox
+from tkinter import ttk # widgets combobox...
 from tkinter import font # police d'écriture
 import time
 
@@ -117,6 +117,62 @@ class Bind:
 		my_label = tkinter.Label(root, text='Affichage du texte')
 		my_label.pack()
 
+class ClipBoard:
+    """La fonction clipboard_xxx() a plusieurs fonctionnalités :
+    -> clipboard_delete() : réinitialise les données dans le presse-papier
+    -> clipboard_append() : ajout des données dans le presse-papier
+    -> clipboard_get() : contenu des données dans le presse-papier
+    Fonction retrouvée dans les cours suivants dans codemy_tkinter :
+	index108_buildATextEditor et suivants
+	"""
+    
+    def __init__(self, root):
+        self.root = root
+        self.widgets()
+        
+    def widgets(self):
+        
+        self.my_text = tkinter.Text(root, width=40, height=5,)
+        self.my_text.pack()
+        
+        my_button_copy = tkinter.Button(
+			root,
+   			text='Copier',
+			command=self.copy_it)
+        my_button_copy.pack()
+        
+        # Bouton contenu dans le presse-papier
+        my_button_content = tkinter.Button(
+            root, 
+            text="Contenu", 
+            command=self.content_it)
+        my_button_content.pack()
+        
+        self.my_label = tkinter.Label(root, text="")
+        self.my_label.pack()
+        
+    def copy_it(self):
+        """Méthode permettant de réinitialiser le contenu dans le 
+        presse-papier et de copier les données sélectionnées"""
+        
+        # Texte sélectionné
+        selected = self.my_text.selection_get()
+        
+        # Réinitialisation des données dans le presse-papier
+        root.clipboard_clear()
+        
+        # Ajout des données séléectionnées dans le presse-papier
+        root.clipboard_append(selected)
+              
+    def content_it(self):
+        "Méthode permettant d'afficher le contenu du presse-papier"
+        
+        # contenu dans le presse-papier
+        selected = root.clipboard_get()
+        
+        # affichage du contenu dans le presse-papier
+        self.my_label.config(text=f"Contenu du presse-papier : {selected}")
+
 class Config:
 	"""La fonction config() permet de modifier la saisie faite dans le widget
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
@@ -136,6 +192,9 @@ class Config:
 	index098_spinboxes
 	index099_textBox
 	index102_textBoxBoldItalics
+	index103_textBoxUndoRedoTitle
+	index105_buildATextEditor et suivants
+	index113_ticTacToeGame
 	"""
 
 	def __init__(self, root):
@@ -180,7 +239,7 @@ class Current:
 class Curselection:
 
 	"""la fonction reversed permet de prendre d'un seul coup toutes les données 
-    électionnées. À défaut de cette instruction, les données à supprimer seront 
+    Sélectionnées. À défaut de cette instruction, les données à supprimer seront 
     effacées une par une à chaque fois qu'on appuye sur le bouton concerné
     Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index062_listBox&ScrollBars"""
@@ -211,7 +270,8 @@ class Curselection:
 			self.my_listbox.delete(0, 'end')
 
 class Delete:
-	"""La fonction delete(0, 'end') permet d'effacer les données affichées dans le widget
+	"""La fonction delete(0, 'end') permet d'effacer les données 
+ 	affichées dans le widget
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index005_calculatrice
 	index006_calculatrice
@@ -226,6 +286,7 @@ class Delete:
 	index061_listBox
 	index062_listBox&ScrollBars
 	index099_textBox
+	index105_buildATextEditor et suivants
 	"""
 
 	def __init__(self, root):
@@ -413,7 +474,8 @@ class Hide:
 		self.my_text.insert('end', 'e')
 
 class Insert:
-	"""La fonction insert(0, argument) permet d'insérer des données dans le widget Entry
+	"""La fonction insert(0, argument) permet d'insérer des données 
+ 	dans le widget Entry
 	Pour le widget Text la fonction est insert('end', argument)
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index005_calculatrice
@@ -426,6 +488,8 @@ class Insert:
 	index100_textBoxFiledialog
 	index101_textBoxImagesScrollBar
 	index102_textBoxBoldItalics
+	index103_textBoxUndoRedoTitle
+	index105_buildATextEditor et suivants
 	"""
 
 	def __init__(self, root):
@@ -559,6 +623,7 @@ class SelectionGet:
     """La fonction selection_get() permet de sélectionner un texte ou une partie
     du texte dans le widget text et dans l'exemple ci-dessous, de l'afficher
 	index102_textBoxBoldItalics
+	index107_buildATextEditor et suivants
 	"""
     
     def __init__(self, root):
@@ -614,6 +679,8 @@ class Tag:
     dans le widget Text
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index102_textBoxBoldItalics
+	index103_textBoxUndoRedoTitle
+	index109_buildATextEditor et suivants
 	"""
     
     def __init__(self, root):
@@ -679,6 +746,7 @@ if __name__ == '__main__':
 	# add = Add(root)
 	# after = After(root)
 	# bind = Bind(root)
+	# clipboard = ClipBoard(root)
 	# config = Config(root)
 	# current = Current(root)
 	# curselection = Curselection(root)
