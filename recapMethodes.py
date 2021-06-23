@@ -195,6 +195,13 @@ class Config:
 	index103_textBoxUndoRedoTitle
 	index105_buildATextEditor et suivants
 	index113_ticTacToeGame
+	index114_Excel
+	index123_messageBoxCustom
+	index124_ExcelListbox
+	index127_menuDisableDelete
+	index128_timeLocale
+	index129_modules1
+	index130_spinboxReset
 	"""
 
 	def __init__(self, root):
@@ -287,6 +294,8 @@ class Delete:
 	index062_listBox&ScrollBars
 	index099_textBox
 	index105_buildATextEditor et suivants
+	index125_ExcelTreeview
+	index127_menuDisableDelete
 	"""
 
 	def __init__(self, root):
@@ -314,6 +323,7 @@ class Destroy:
 	index023_dataBases
 	index042_overwriteLabels
 	index050_deleteFrameChildrenWidgets
+	index123_messageBoxCustom
 	"""
 
 	def __init__(self, root):
@@ -394,6 +404,8 @@ class Get:
  	index080_resizeWindow
 	index098_spinboxes
 	index099_textBox
+	index124_ExcelListbox
+	index129_modules1
 	"""
 
 	def __init__(self, root):
@@ -490,6 +502,7 @@ class Insert:
 	index102_textBoxBoldItalics
 	index103_textBoxUndoRedoTitle
 	index105_buildATextEditor et suivants
+	index125_ExcelTreeview
 	"""
 
 	def __init__(self, root):
@@ -648,12 +661,12 @@ class SelectionGet:
         self.my_label.config(text=my_select)
 
 class Set:
-	"""La fonction set() permet de modifier le texte affiché et il est utilisé surtout avec le widget Label
-	en recourant aux variables de contrôles
+	"""La fonction set() permet de modifier le texte affiché en recourant aux variables de contrôles
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index012_radioButton
 	index018_optionMenu
 	index045_bindComboBox&OptionMenu
+	index130_spinboxReset
 	"""
 
 	def __init__(self, root):
