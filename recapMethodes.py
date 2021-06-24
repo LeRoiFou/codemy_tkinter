@@ -90,6 +90,8 @@ class Bind:
 	index075_mouse&Images
 	index085_mouseColorButtonPopupMessage
 	index096_fullScreenScrollBar
+	index135_transparentWindow
+	index137_menuPopupsBind
 	"""
 
 	def __init__(self, root):
@@ -202,6 +204,8 @@ class Config:
 	index128_timeLocale
 	index129_modules1
 	index130_spinboxReset
+	index135_transparentWindow
+	index137_menuPopupsBind
 	"""
 
 	def __init__(self, root):
@@ -324,6 +328,7 @@ class Destroy:
 	index042_overwriteLabels
 	index050_deleteFrameChildrenWidgets
 	index123_messageBoxCustom
+	index139_splashScreen
 	"""
 
 	def __init__(self, root):
@@ -406,6 +411,7 @@ class Get:
 	index099_textBox
 	index124_ExcelListbox
 	index129_modules1
+	index135_transparentWindow
 	"""
 
 	def __init__(self, root):
