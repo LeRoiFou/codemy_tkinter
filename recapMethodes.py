@@ -92,6 +92,7 @@ class Bind:
 	index096_fullScreenScrollBar
 	index135_transparentWindow
 	index137_menuPopupsBind
+	index149_canvasEntryBoxes
 	"""
 
 	def __init__(self, root):
@@ -206,6 +207,10 @@ class Config:
 	index130_spinboxReset
 	index135_transparentWindow
 	index137_menuPopupsBind
+ 	index141_memoryGame
+	index142_memoryGame
+	index144_rockPaperScissorsGame
+	et suivants...
 	"""
 
 	def __init__(self, root):
@@ -233,6 +238,7 @@ class Current:
 	"""La fonction current() permet d'afficher par défaut une donnée
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index045_bindComboBox&OptionMenu
+	index152_dependentComboboxListbox
 	"""
 
 	def __init__(self, root):
@@ -253,7 +259,9 @@ class Curselection:
     Sélectionnées. À défaut de cette instruction, les données à supprimer seront 
     effacées une par une à chaque fois qu'on appuye sur le bouton concerné
     Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index062_listBox&ScrollBars"""
+	index062_listBox&ScrollBars
+	index155_todoList et suivants
+ 	"""
 
 	def __init__(self, root):
 		self.root = root
@@ -300,6 +308,11 @@ class Delete:
 	index105_buildATextEditor et suivants
 	index125_ExcelTreeview
 	index127_menuDisableDelete
+	index143_pdf
+	index149_canvasEntryBoxes
+	index152_dependentComboboxListbox
+	index153_serialization2
+	index154_todoList et suivants
 	"""
 
 	def __init__(self, root):
@@ -329,6 +342,7 @@ class Destroy:
 	index050_deleteFrameChildrenWidgets
 	index123_messageBoxCustom
 	index139_splashScreen
+	index149_canvasEntryBoxes
 	"""
 
 	def __init__(self, root):
@@ -412,6 +426,11 @@ class Get:
 	index124_ExcelListbox
 	index129_modules1
 	index135_transparentWindow
+	index144_rockPaperScissorsGame
+	index149_canvasEntryBoxes
+	index152_dependentComboboxListbox
+	index153_serialization1
+	index153_serialization2
 	"""
 
 	def __init__(self, root):
@@ -493,8 +512,9 @@ class Hide:
 
 class Insert:
 	"""La fonction insert(0, argument) permet d'insérer des données 
- 	dans le widget Entry
+ 	dans le widget Entry / Text...
 	Pour le widget Text la fonction est insert('end', argument)
+	Mais pour le cours index143_pdf la fonction est insert(1.0, argument)...
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index005_calculatrice
 	index006_calculatrice
@@ -509,6 +529,11 @@ class Insert:
 	index103_textBoxUndoRedoTitle
 	index105_buildATextEditor et suivants
 	index125_ExcelTreeview
+	index143_pdf
+	index152_dependentComboboxListbox
+	index153_serialization1
+	index153_serialization2
+	index154_todoList et suivants
 	"""
 
 	def __init__(self, root):
