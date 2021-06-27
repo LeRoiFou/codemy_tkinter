@@ -39,6 +39,7 @@ class After:
     """La fonction after permet de mettre à jour un widget
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index079_timeLocale
+	index164_animateWidgets
 	"""
     
     def __init__(self, root):
@@ -93,6 +94,7 @@ class Bind:
 	index135_transparentWindow
 	index137_menuPopupsBind
 	index149_canvasEntryBoxes
+	index162_search
 	"""
 
 	def __init__(self, root):
@@ -239,6 +241,7 @@ class Current:
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index045_bindComboBox&OptionMenu
 	index152_dependentComboboxListbox
+	index163_beaufifulSoupBitcoinPrice
 	"""
 
 	def __init__(self, root):
@@ -313,6 +316,12 @@ class Delete:
 	index152_dependentComboboxListbox
 	index153_serialization2
 	index154_todoList et suivants
+	index157_colorChangingNumberGame
+	index162_search
+	index168_foreinLanguageFlashCard
+	index169_wikipediaSearch
+	index170_passwordGenerator
+	index171_currencyConverter
 	"""
 
 	def __init__(self, root):
@@ -431,6 +440,13 @@ class Get:
 	index152_dependentComboboxListbox
 	index153_serialization1
 	index153_serialization2
+	index156_todoList
+	index157_colorChangingNumberGame
+	index158_resizeWindowControlPanel
+	index162_search
+	index168_foreinLanguageFlashCard
+	index170_passwordGenerator
+	index171_currencyConverter
 	"""
 
 	def __init__(self, root):
@@ -534,6 +550,10 @@ class Insert:
 	index153_serialization1
 	index153_serialization2
 	index154_todoList et suivants
+	index162_search
+	index169_wikipediaSearch
+	index170_passwordGenerator
+	index171_currencyConverter
 	"""
 
 	def __init__(self, root):
