@@ -23,7 +23,8 @@ class GUI:
 
 		# affichage
 		myLabel1.grid(row=0, column=0)
-		myLabel2.grid(row=1, column=5)  # équivaut à la colonne 2 car rien n'est saisi de la colonne 2 à 4
+		# équivaut à la colonne 2 car rien n'est saisi de la colonne 2 à 4
+		myLabel2.grid(row=1, column=5)  
 
 
 if __name__ == "__main__":
