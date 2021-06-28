@@ -1,830 +1,882 @@
 """
-Récapitulatif des fonctions natives dans tkinter
+Tkinter - Codemy.com #181 : Search Database Treeview By Last Name 
+- Python Tkinter GUI Tutorial 182
+Lien : https://www.youtube.com/watch?v=odt87CeLlro
 
-Touches raccourcies :
--> pour tout plier : CTRL + K + 1
--> pour tout déplier : CTRL + K + J
+Dans ce programme on apprend autre chose qu'à convertir 
+une devise en une autre devise, 
+pour cela on a recours à une API 
+(interface de programmation applicative)...
+
+On apprend à créer un CRM 
+(Customer Relationship Management = Gestion de la relation client) 
+avec le widget treeview (arborescence) et le recours 
+à une base de données
+
+Dans ce cours on apprend à créer une nouvelle fenêtre permettant
+de lister les noms selon le nom recherché
+Pour cela on a recours à la méthode search_records() avec la mise
+en place d'un nouveau menu dans la fenêtre principale
+
+À chaque fois qu'on intervient dans le SGBD, 
+on a recours au langage SQL avec l'instruction c.execute()
 
 Éditeur : Laurent REYNAUD
-Date : 16-05-2021
+Date : 23-06-2021
 """
 
 import tkinter
-from tkinter import ttk # widgets combobox...
-from tkinter import font # police d'écriture
-import time
+# Pour le widget treeview
+from tkinter import LabelFrame, ttk
+# Message d'information/alerte...
+from tkinter import messagebox 
+# Couleurs pour les widgets
+from tkinter import colorchooser 
+import sqlite3
 
-class Add:
-	"""La fonction add permet d'ajouter un widget sur un autre widget
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index048_panedWindows
-	index064_noteBook
-	"""
+class GUI:
 
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		# Configuration du panneau de fenêtre qui s'étendra sur toute la fenêtre
-		panel_1 = tkinter.PanedWindow(bd=4, relief='raised', bg='red')
-		panel_1.pack(fill='both', expand=1)  # extension sur toute la longueur et la largeur de la fenêtre
-
-		# Configuration du panneau haut à l'intérieur du panneau ci-avant
-		panel_2 = tkinter.PanedWindow(panel_1, orient='vertical', bd=4, relief='raised', bg='blue')
-		panel_1.add(panel_2)
-
-class After:
-    """La fonction after permet de mettre à jour un widget
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index079_timeLocale
-	index164_animateWidgets
-	"""
-    
     def __init__(self, root):
         self.root = root
-        self.widgets()
-        self.clock()
-    
-    def widgets(self):
-        
-        """Configuration étiquette résultat (temps actuel)"""
-        self.my_label = tkinter.Label(root, text='', font='Helvetica 48', fg='green', bg='black')
-        self.my_label.pack(pady=20)
+        self.root.title('CRM')
+        self.root.geometry('1000x500')
+        self.database()
+        self.menu()
+        self.widgets_treeview()
+        self.widgets_data()
+        self.widgets_buttons()
+        self.query_database()
 
-        """Configuration d'une deuxième étiquette (date actuelle)"""
-        self.my_label2 = tkinter.Label(root, text='', font='Helvetica 14')
-        self.my_label2.pack(pady=10)
-        
-    def clock(self):
-        """Affichage de l'heure : minute : seconde actuelles :
-        -> On déclare les variables de temps avec l'instruction strftime()
-        -> L'étiquette résultat affiche le temps actuelle grâce à l'instruction config()
-        -> Mise à jour de l'étiquette avec l'instruction after() 
-        avec pour arguments le temps en millisecondes et 
-        une fonction récursive (fonction s'appelant elle-même)"""
-        
-        hour = time.strftime("%H")
-        minute = time.strftime("%M")
-        second = time.strftime("%S")
-        day = time.strftime("%A")
-        numb_day = time.strftime("%e")
-        month = time.strftime("%B")
-        year = time.strftime("%Y")
-        # affichage du temps actuel
-        self.my_label.config(text=hour + ':' + minute + ':' + second)
-        # mise à jour du temps avec en arguments : temps en millisecondes, fonction  
-        self.my_label.after(1000, self.clock)  
-        # affichage de la date actuelle
-        self.my_label2.config(text=day + ' ' + numb_day + ' ' + month + ' ' + year)   
+    def menu(self):
+       "Menu pour configurer les couleurs du widget treeview"
+       
+       # Ajout du menu
+       my_menu = tkinter.Menu(root)
+       root.config(menu=my_menu)
+       
+       # Menu 'Options'
+       option_menu = tkinter.Menu(my_menu, tearoff=0)
+       my_menu.add_cascade(label="Options", menu=option_menu)
+       
+       # Menu déroulant de 'Options'
+       option_menu.add_command(
+           label="Changer les couleurs primaires", 
+           command=self.primary_color)
+       option_menu.add_command(
+           label="Changer les couleurs secondaires", 
+           command=self.secondary_color)
+       option_menu.add_command(
+           label="Couleur de la ligne sélectionnée", 
+           command=self.highlight_color)
+       option_menu.add_separator()
+       option_menu.add_command(label="Quitter", command=root.quit)
+       
+       # Menu 'Recherche'
+       search_menu = tkinter.Menu(my_menu, tearoff=0)
+       my_menu.add_cascade(label="Rechercher", menu=search_menu)
+       
+       # Menu déroulant de 'Recherche'
+       search_menu.add_command(
+           label="Rechercher", 
+           command=self.lookup_records)
+       search_menu.add_separator()
+       search_menu.add_command(
+           label="Réinitialiser", 
+           command=self.query_database)
+       
+    def database(self):
 
-class Bind:
-	"""La fonction bind qui comprend deux arguments (<évènement>, action) permet d'intervenir sur un widget
-	en recourant aux touches du clavier ou à la souris
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index044_bind
-	index045_bindComboBox&OptionMenu
-	index069_canvas&ArrowKeys
-	index070_canvas&ArrowKeys&Images
-	index071_canvas&Mouse&Images
-	index075_mouse&Images
-	index085_mouseColorButtonPopupMessage
-	index096_fullScreenScrollBar
-	index135_transparentWindow
-	index137_menuPopupsBind
-	index149_canvasEntryBoxes
-	index162_search
-	"""
+        """
+        # Liste de données clients
+        self.data = [
+        	["John", "Elder", 1, "123 Elder St.", 
+         "Las Vegas", "NV", "89137"],
+        	["Mary", "Smith", 2, "435 West Lookout", 
+         "Chicago", "IL", "60610"],
+        	["Tim", "Tanaka", 3, "246 Main St.", 
+         "New York", "NY", "12345"],
+        	["Erin", "Erinton", 4, "333 Top Way.", 
+         "Los Angeles", "CA", "90210"],
+        	["Bob", "Bobberly", 5, "876 Left St.", 
+         "Memphis", "TN", "34321"],
+        	["Steve", "Smith", 6, "1234 Main St.", 
+         "Miami", "FL", "12321"],
+        	["Tina", "Browne", 7, "654 Street Ave.", 
+         "Chicago", "IL", "60611"],
+        	["Mark", "Lane", 8, "12 East St.", 
+         "Nashville", "TN", "54345"],
+        	["John", "Smith", 9, "678 North Ave.", 
+         "St. Louis", "MO", "67821"],
+        	["Mary", "Todd", 10, "9 Elder Way.", 
+         "Dallas", "TX", "88948"],
+        	["John", "Lincoln", 11, "123 Elder St.", 
+         "Las Vegas", "NV", "89137"],
+        	["Mary", "Bush", 12, "435 West Lookout", 
+         "Chicago", "IL", "60610"],
+        	["Tim", "Reagan", 13, "246 Main St.", 
+         "New York", "NY", "12345"],
+        	["Erin", "Smith", 14, "333 Top Way.", 
+         "Los Angeles", "CA", "90210"],
+        	["Bob", "Field", 15, "876 Left St.", 
+         "Memphis", "TN", "34321"],
+        	["Steve", "Target", 16, "1234 Main St.", 
+         "Miami", "FL", "12321"],
+        	["Tina", "Walton", 17, "654 Street Ave.", 
+         "Chicago", "IL", "60611"],
+        	["Mark", "Erendale", 18, "12 East St.", 
+         "Nashville", "TN", "54345"],
+        	["John", "Nowerton", 19, "678 North Ave.", 
+         "St. Louis", "MO", "67821"],
+        	["Mary", "Hornblower", 20, "9 Elder Way.", 
+         "Dallas", "TX", "88948"]	
+        ]
+        """
 
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
+        """Création d'une base de donnée ou 
+        connection à cette base de donnée"""
+        self.conn = sqlite3.connect('database/tree_crm.db')
 
-	def widgets(self):
-		
-		my_button = tkinter.Button(root, text='Appuye-moi !')
-		 # sélection automatique du bouton
-		my_button.focus()
-		# lorsqu'on clique avec le bouton de droite la méthode clicker() s'active
-		# my_button.bind('<Button-3>', self.clicker)
-		# lorsque la souris va sur le bouton, la méthode clicker() s'active
-		my_button.bind('<Enter>', self.clicker)
-		# en appuyant sur Entrée la méthode clicker() s'active
-		# my_button.bind('<Return>', self.clicker)
-		# en appuyant sur n'importe quelle touche du clavier la méthode clicker() s'active
-		# my_button.bind('<Key>', self.clicker)
-		
-		my_button.pack()
+        # Création d'une instance de curseur
+        c = self.conn.cursor()
 
-	def clicker(self, e):
+        # Création d'une table si cette table n'existe pas
+        c.execute("""CREATE TABLE if not exists customers (
+        	Prenom text,
+        	Nom text,
+        	ID integer,
+        	Adresse text,
+        	Ville text,
+        	Departement text,
+        	CP text)
+        	""")
+        """
+        # Ajout des éléments à la base de données
+        for record in self.data:
+        	c.execute("INSERT INTO customers VALUES 
+         (:Prenom, :Nom, :ID, :Adresse, 
+         :Ville, :Departement, :CP)", 
+        {
+        'Prenom': record[0],
+        'Nom': record[1],
+        'ID': record[2],
+        'Adresse': record[3],
+        'Ville': record[4],
+        'Departement': record[5],
+        'CP': record[6]
+        }
+        )
+        """
 
-		my_label = tkinter.Label(root, text='Affichage du texte')
-		my_label.pack()
+        # Commit
+        self.conn.commit()
 
-class ClipBoard:
-    """La fonction clipboard_xxx() a plusieurs fonctionnalités :
-    -> clipboard_delete() : réinitialise les données dans le presse-papier
-    -> clipboard_append() : ajout des données dans le presse-papier
-    -> clipboard_get() : contenu des données dans le presse-papier
-    Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index108_buildATextEditor et suivants
-	"""
-    
-    def __init__(self, root):
-        self.root = root
-        self.widgets()
+        # Arrêt de la connection
+        self.conn.close()
+
+    def widgets_treeview(self):
+        "Configuration du widget treeview"
+
+        # Ajout de style
+        self.style = ttk.Style()
+
+        # Choix d'un thème
+        self.style.theme_use('default')
+
+        # Configuration des couleurs du treeview
+        self.style.configure("Treeview", 
+        	background="#D3D3D3",
+        	foreground="black",
+        	rowheight=25,
+        	fieldbackground="#D3D3D3")
+
+        # Changement de couleur à la sélection
+        self.style.map('Treeview',
+        	background=[('selected', '#347083')])
+
+        """Créer un cadre pour le treeview 
+        (pour la barre de défilement du treview)"""
+        tree_frame = tkinter.Frame(root)
+        tree_frame.pack(pady=10)
+
+        # Créer une barre de défilement pour le treeview
+        tree_scroll = tkinter.Scrollbar(tree_frame)
+        tree_scroll.pack(side='right', fill='y')
+
+        # Création du treeview
+        self.my_tree = ttk.Treeview(
+            tree_frame,
+            yscrollcommand=tree_scroll.set, 
+            selectmode="extended")
+        self.my_tree.pack()
+
+        # Configuration de la barre de défilement
+        tree_scroll.config(command=self.my_tree.yview)
+
+        # Configuration des en-têtes
+        self.my_tree['columns'] = (
+            "Prénom", 
+            "Nom", 
+            "ID", 
+            "Adresse",
+            "Ville", 
+            "Etat", 
+            "Code postal")
+
+        # Format des en-têtes
+        self.my_tree.column("#0",
+                            width=0, 
+                            stretch='no')
+        self.my_tree.column("Prénom", 
+                            anchor='w', 
+                            width=140)
+        self.my_tree.column("Nom", 
+                            anchor='w',
+                            width=140)
+        self.my_tree.column("ID", 
+                            anchor='center',
+                            width=100)
+        self.my_tree.column("Adresse", 
+                            anchor='center',
+                            width=140)
+        self.my_tree.column("Ville", 
+                            anchor='center', 
+                            width=140)
+        self.my_tree.column("Etat", 
+                            anchor='center', 
+                            width=140)
+        self.my_tree.column("Code postal", 
+                            anchor='center', 
+                            width=140)
+
+        # Configuration des entêtes lors du passage avec la souris
+        self.my_tree.heading("#0", 
+                             text="", 
+                             anchor='w')
+        self.my_tree.heading("Prénom", 
+                             text="Prénom", 
+                             anchor='w')
+        self.my_tree.heading("Nom", 
+                             text="Nom", 
+                             anchor='w')
+        self.my_tree.heading("ID", 
+                             text="ID", 
+                             anchor='center')
+        self.my_tree.heading("Adresse", 
+                             text="Adresse", 
+                             anchor='center')
+        self.my_tree.heading("Ville", 
+                             text="Ville", 
+                             anchor='center')
+        self.my_tree.heading("Etat",
+                             text="Département", 
+                             anchor='center')
+        self.my_tree.heading("Code postal",
+                             text="Code postal",
+                             anchor='center')
+
+        "Configuration des lignes du treeview"
         
-    def widgets(self):
+        # Lignes impaires
+        self.my_tree.tag_configure(
+            "oddrow", 
+            background="white") 
         
-        self.my_text = tkinter.Text(root, width=40, height=5,)
-        self.my_text.pack()
-        
-        my_button_copy = tkinter.Button(
-			root,
-   			text='Copier',
-			command=self.copy_it)
-        my_button_copy.pack()
-        
-        # Bouton contenu dans le presse-papier
-        my_button_content = tkinter.Button(
+        # Lignes paires
+        self.my_tree.tag_configure(
+            "evenrow",
+            background="lightblue") 
+
+    def widgets_data(self):
+        """Configuration des widgets pour 
+        l'enregistrement des données"""
+
+        # Ajout des champs de saisies pour les enregistrements
+        data_frame = tkinter.LabelFrame(
             root, 
-            text="Contenu", 
-            command=self.content_it)
-        my_button_content.pack()
+            text='Enregistrements')
+        data_frame.pack(fill='x', expand='yes', padx=20)
+
+        fn_label = tkinter.Label(data_frame, text='Prénom')
+        fn_label.grid(row=0, column=0, padx=10, pady=10)
+        self.fn_entry = tkinter.Entry(data_frame)
+        self.fn_entry.grid(row=0, column=1, padx=10, pady=10)
+
+        ln_label = tkinter.Label(data_frame, text='Nom')
+        ln_label.grid(row=0, column=2, padx=10, pady=10)
+        self.ln_entry = tkinter.Entry(data_frame)
+        self.ln_entry.grid(row=0, column=3, padx=10, pady=10)
+
+        id_label = tkinter.Label(data_frame, text='ID')
+        id_label.grid(row=0, column=4, padx=10, pady=10)
+        self.id_entry = tkinter.Entry(data_frame)
+        self.id_entry.grid(row=0, column=5, padx=10, pady=10)
+
+        address_label = tkinter.Label(data_frame, text='Adresse')
+        address_label.grid(row=1, column=0, padx=10, pady=10)
+        self.address_entry = tkinter.Entry(data_frame)
+        self.address_entry.grid(row=1, column=1, padx=10, pady=10)
+
+        city_label = tkinter.Label(data_frame, text='Ville')
+        city_label.grid(row=1, column=2, padx=10, pady=10)
+        self.city_entry = tkinter.Entry(data_frame)
+        self.city_entry.grid(row=1, column=3, padx=10, pady=10)
+
+        state_label = tkinter.Label(data_frame, text='Etat')
+        state_label.grid(row=1, column=4, padx=10, pady=10)
+        self.state_entry = tkinter.Entry(data_frame)
+        self.state_entry.grid(row=1, column=5, padx=10, pady=10)
+
+        zipcode_label = tkinter.Label(data_frame, text='Code postal')
+        zipcode_label.grid(row=1, column=6, padx=10, pady=10)
+        self.zipcode_entry = tkinter.Entry(data_frame)
+        self.zipcode_entry.grid(row=1, column=7, padx=10, pady=10)
+
+    def widgets_buttons(self):
+        "Configuration des widgets des boutons"
+
+        # Ajout de boutons
+        button_frame = tkinter.LabelFrame(root, text='Commandes')
+        button_frame.pack(fill='x', expand='yes', padx=20)
+
+        update_button = tkinter.Button(
+            button_frame, 
+            text='Modifier', 
+            command=self.update_record)
+        update_button.grid(row=0, column=0, padx=10, pady=10)
+
+        add_button = tkinter.Button(
+            button_frame, 
+            text='Ajouter', 
+            command=self.add_record)
+        add_button.grid(row=0, column=1, padx=10, pady=10)
+
+        remove_all_button = tkinter.Button(
+            button_frame, 
+            text='Tout supprimer', 
+            command=self.remove_all)
+        remove_all_button.grid(row=0, column=2, padx=10, pady=10)
+
+        remove_one_button = tkinter.Button(
+            button_frame, 
+            text='Supprimer une donnée', 
+            command=self.remove_one)
+        remove_one_button.grid(row=0, column=3, padx=10, pady=10)
+
+        remove_many_button = tkinter.Button(
+            button_frame, 
+            text='Supprimer plusieurs données', 
+            command=self.remove_many)
+        remove_many_button.grid(row=0, column=4, padx=10, pady=10)
+
+        move_up_button = tkinter.Button(
+            button_frame, 
+            text='Monter', 
+            command=self.up)
+        move_up_button.grid(row=0, column=5, padx=10, pady=10)
+
+        move_down_button = tkinter.Button(
+            button_frame, 
+            text='Descendre', 
+            command=self.down)
+        move_down_button.grid(row=0, column=6, padx=10, pady=10)
+
+        select_record_button = tkinter.Button(
+            button_frame, 
+            text="Effacer les données affichées", 
+            command=self.clear_entries)
+        select_record_button.grid(row=0, column=7, padx=10, pady=10)
+
+        # À chaque fois qu'on sélectionne un enregistrement 
+        # celui-ci s'affiche
+        self.my_tree.bind("<ButtonRelease-1>", self.select_record)
+
+    def primary_color(self):
+        "Méthode changeant les couleurs primaires du widget Treeview"
         
-        self.my_label = tkinter.Label(root, text="")
-        self.my_label.pack()
+        # Ouverture de la fenêture du choix des couleurs
+        primary_color = colorchooser.askcolor()[1]
         
-    def copy_it(self):
-        """Méthode permettant de réinitialiser le contenu dans le 
-        presse-papier et de copier les données sélectionnées"""
-        
-        # Texte sélectionné
-        selected = self.my_text.selection_get()
-        
-        # Réinitialisation des données dans le presse-papier
-        root.clipboard_clear()
-        
-        # Ajout des données séléectionnées dans le presse-papier
-        root.clipboard_append(selected)
-              
-    def content_it(self):
-        "Méthode permettant d'afficher le contenu du presse-papier"
-        
-        # contenu dans le presse-papier
-        selected = root.clipboard_get()
-        
-        # affichage du contenu dans le presse-papier
-        self.my_label.config(text=f"Contenu du presse-papier : {selected}")
-
-class Config:
-	"""La fonction config() permet de modifier la saisie faite dans le widget
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index061_listBox
-	index062_listBox&ScrollBars
-	index063_config&Update
-	index065_multipleEntry
-	index066_imageButton&Border
-	index067_entryAsInteger
-	index071_canvas&Mouse&Images
-	index072_calendar
-	index074_OS
-	index075_mouse&Images
-	index079_timeLocale
-	index085_mouseColorButtonPopupMessage
-	index097_threads
-	index098_spinboxes
-	index099_textBox
-	index102_textBoxBoldItalics
-	index103_textBoxUndoRedoTitle
-	index105_buildATextEditor et suivants
-	index113_ticTacToeGame
-	index114_Excel
-	index123_messageBoxCustom
-	index124_ExcelListbox
-	index127_menuDisableDelete
-	index128_timeLocale
-	index129_modules1
-	index130_spinboxReset
-	index135_transparentWindow
-	index137_menuPopupsBind
- 	index141_memoryGame
-	index142_memoryGame
-	index144_rockPaperScissorsGame
-	et suivants...
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		self.my_entry = tkinter.Entry(root)
-		self.my_entry.pack()
-
-		my_button = tkinter.Button(root, text="Modifier", command=self.func_config)
-		my_button.pack()
-
-		self.my_label = tkinter.Label(root, text="")
-		self.my_label.pack()
-
-	def func_config(self):
-		
-		insert = self.my_entry.get()
-		self.my_label.config(text=insert)
-
-class Current:
-
-	"""La fonction current() permet d'afficher par défaut une donnée
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index045_bindComboBox&OptionMenu
-	index152_dependentComboboxListbox
-	index163_beaufifulSoupBitcoinPrice
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		options = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche']
-
-		self.myCombo = ttk.Combobox(root, value=options)
-		self.myCombo.current(2)  # affichage par défaut : mercredi
-		self.myCombo.pack()
-
-class Curselection:
-
-	"""la fonction reversed permet de prendre d'un seul coup toutes les données 
-    Sélectionnées. À défaut de cette instruction, les données à supprimer seront 
-    effacées une par une à chaque fois qu'on appuye sur le bouton concerné
-    Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index062_listBox&ScrollBars
-	index155_todoList et suivants
- 	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-
-		self.my_listbox = tkinter.Listbox(root, justify='center', selectmode='multiple')
-		self.my_listbox.pack()
-
-		my_list = ['Un', 'Deux', 'Trois', 'Un', 'Deux', 'Trois', 'Un', 'Deux', 'Trois', 
-	        'Un', 'Deux', 'Trois', 'Un', 'Deux','Trois', 'Un', 'Deux', 'Trois', 'Un',
-	        'Deux', 'Trois']
-
-		for item in my_list:
-	        # insertion des données de la liste ci-dessus dans la zone de liste
-			self.my_listbox.insert('end', item)
-
-		my_button = tkinter.Button(root, text="Supprimer tout", command=self.delete_multiple)
-		my_button.pack()
-
-	def delete_multiple(self):
-
-		for item in reversed(self.my_listbox.curselection()):
-			self.my_listbox.delete(0, 'end')
-
-class Delete:
-	"""La fonction delete(0, 'end') permet d'effacer les données 
- 	affichées dans le widget
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index005_calculatrice
-	index006_calculatrice
-	index007_calculatrice
-	index020_dataBases
-	index021_dataBases
-	index022_dataBases
-	index023_dataBases
-	index038_entry&Height
-	index041_removeLabels
-	index042_overwriteLabels
-	index061_listBox
-	index062_listBox&ScrollBars
-	index099_textBox
-	index105_buildATextEditor et suivants
-	index125_ExcelTreeview
-	index127_menuDisableDelete
-	index143_pdf
-	index149_canvasEntryBoxes
-	index152_dependentComboboxListbox
-	index153_serialization2
-	index154_todoList et suivants
-	index157_colorChangingNumberGame
-	index162_search
-	index168_foreinLanguageFlashCard
-	index169_wikipediaSearch
-	index170_passwordGenerator
-	index171_currencyConverter
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		self.my_entry = tkinter.Entry(root)
-		self.my_entry.pack()
-
-		my_buttonDelete = tkinter.Button(root, text="Effacer", command=lambda:self.func_delete())
-		my_buttonDelete.pack()
-
-	def func_delete(self):
-
-		self.my_entry.delete(0, 'end')
-
-class Destroy:
-	"""La fonction 'destroy' permet d'éviter de fermer automatiquement le widget à la différence de 'quit'
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index005_calculatrice
-	index006_calculatrice
-	index007_calculatrice
-	index023_dataBases
-	index042_overwriteLabels
-	index050_deleteFrameChildrenWidgets
-	index123_messageBoxCustom
-	index139_splashScreen
-	index149_canvasEntryBoxes
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-
-		my_button1 = tkinter.Button(root, text="Clique pour une nouvelle fenêtre", command=self.open_window)
-		my_button1.pack()
-
-	def open_window(self):
-
-		top = tkinter.Toplevel()
-
-		my_label = tkinter.Label(top, text="Félicitations ! Tu as ouvert une nouvelle fenêtre")
-		my_label.pack()
-
-		my_button2 = tkinter.Button(top, text="Quitter cette fenêtre", command=top.destroy)
-		my_button2.pack()
-
-class Focus:
-	"""La fonction focus() permet d'insérer automatiquement le selecteur de la souris dans le widget concerné
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		self.my_entry = tkinter.Entry(root, justify="center")
-		self.my_entry.focus()
-		self.my_entry.pack()
-
-class Forget:
-	"""La fonction forget() permet de faire disparaître un wiget
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index041_removeLabels
-	index042_overwriteLabels
-	index047_menus&Frame
-	index050_deleteFrameChildrenWidgets
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-
-		self.my_label = tkinter.Label(root, text="Ce texte ne disparaîtra jamais !")
-		self.my_label.pack()
-
-		my_button = tkinter.Button(root, text="Faire disparaître ce texte", command=self.myDelete)
-		my_button.pack()
-
-	def myDelete(self):
-
-		self.my_label.pack_forget()
-
-class Get:
-	"""La fonction get() permet de récupérer les données saisies dans un widget
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index006_calculatrice
-	index007_calculatrice
-	index018_optionMenu
-	index020_dataBases
-	index021_dataBases
-	index022_dataBases
-	index023_dataBases
-	index038_entry&Height
-	index042_overwriteLabels
-	index045_bindComboBox&OptionMenu
-	index061_listBox
-	index065_multipleEntry
-	index067_entryAsInteger
- 	index080_resizeWindow
-	index098_spinboxes
-	index099_textBox
-	index124_ExcelListbox
-	index129_modules1
-	index135_transparentWindow
-	index144_rockPaperScissorsGame
-	index149_canvasEntryBoxes
-	index152_dependentComboboxListbox
-	index153_serialization1
-	index153_serialization2
-	index156_todoList
-	index157_colorChangingNumberGame
-	index158_resizeWindowControlPanel
-	index162_search
-	index168_foreinLanguageFlashCard
-	index170_passwordGenerator
-	index171_currencyConverter
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		self.my_entry = tkinter.Entry(root)
-		self.my_entry.pack()
-
-		my_button = tkinter.Button(root, text="Récupérer", command=self.func_get)
-		my_button.pack()
-
-		self.my_label = tkinter.Label(root, text="")
-		self.my_label.pack()
-
-	def func_get(self):
-		
-		insert = self.my_entry.get()
-		self.my_label.config(text=insert)
-
-class Hide:
-	"""La fonction hide() permet de cacher un onglet
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index064_noteBook
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		# Configuration des onglets
-		self.my_notebook = ttk.Notebook(root)
-		self.my_notebook.pack()
-
-        # Configuration des cadres"""
-		my_frame1 = tkinter.Frame(self.my_notebook, width=500, height=500, bg='blue')
-		my_frame1.pack(fill='both', expand=1)
-		my_frame2 = tkinter.Frame(self.my_notebook, width=500, height=500, bg='red')        
-		my_frame2.pack(fill='both', expand=1)
-
-        # Ajout des onglets
-		self.my_notebook.add(my_frame1, text='Onglet 1')
-		self.my_notebook.add(my_frame2, text='Onglet 2')
-
-        # bouton
-		my_button = tkinter.Button(my_frame1, text="Effacer l'onglet n° 2", command=self.hide_it)
-		my_button.pack()
-
-	def hide_it(self):
-		
-		self.my_notebook.hide(1)
-
-	"""La fonction index('insert') permet d'insérer une image là où se trouve
-	le curseur de la souris
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index101_textBoxImagesScrollBar
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		self.my_text = tkinter.Text(root)
-		self.my_text.pack()
-
-		my_button = tkinter.Button(root, text="Insérer", command=self.func_index)
-		my_button.pack()
-
-	def func_index(self):
-		
-		# position = self.my_text.index('insert')
-		self.my_text.insert('end', 'e')
-
-class Insert:
-	"""La fonction insert(0, argument) permet d'insérer des données 
- 	dans le widget Entry / Text...
-	Pour le widget Text la fonction est insert('end', argument)
-	Mais pour le cours index143_pdf la fonction est insert(1.0, argument)...
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index005_calculatrice
-	index006_calculatrice
-	index007_calculatrice
-	index022_dataBases
-	index023_dataBases
-	index061_listBox
-	index062_listBox&ScrollBars
-	index100_textBoxFiledialog
-	index101_textBoxImagesScrollBar
-	index102_textBoxBoldItalics
-	index103_textBoxUndoRedoTitle
-	index105_buildATextEditor et suivants
-	index125_ExcelTreeview
-	index143_pdf
-	index152_dependentComboboxListbox
-	index153_serialization1
-	index153_serialization2
-	index154_todoList et suivants
-	index162_search
-	index169_wikipediaSearch
-	index170_passwordGenerator
-	index171_currencyConverter
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		self.my_entry = tkinter.Entry(root)
-		self.my_entry.pack()
-
-		my_button = tkinter.Button(root, text="Insérer", command=lambda:self.func_insert("Test ! "))
-		my_button.pack()
-
-	def func_insert(self, e):
-		
-		self.my_entry.insert(0, e)
-
-class Move:
-	"""La fonction 'move' permet de déplacer un widget avec l'instruction bind
-	et les touches du clavier
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index069_canvas&ArrowKeys
-	index070_canvas&ArrowKeys&Images
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-
-		# Tailles et coordonnées en variables
-		w = 600
-		h = 400
-		x = w // 2
-		y = h // 2
-
-		# Configuration d'un canvas sous fond blanc
-		self.my_canvas = tkinter.Canvas(root, width=w, height=h, bg='white')
-		self.my_canvas.pack(pady=20)
-
-		# Configuration d'un cercle"""
-		self.my_circle = self.my_canvas.create_oval(x, y, x + 10, y + 10)
-
-		# Configuration des touches 'qsdz' du clavier pour déplacer le cercle
-		root.bind("<Key>", self.pressing)
-
-		# Configuration des touches directionnelles du clavier pour déplacer le cercle
-		root.bind('<Left>', self.left)
-		root.bind('<Right>', self.right)
-		root.bind('<Up>', self.up)
-		root.bind('<Down>', self.down)
-
-	def left(self, event):
-   			
-		# Déplacement de 10 pixels à la gauche
-		x = -10
-		y = 0
-		self.my_canvas.move(self.my_circle, x, y)
-
-	def right(self, event):
-        
-		# Déplacement de 10 pixels à la droite
-		x = 10
-		y = 0
-		self.my_canvas.move(self.my_circle, x, y)
-
-	def up(self, event):
-	    
-		# Déplacement de 10 pixels en haut
-		x = 0
-		y = -10
-		self.my_canvas.move(self.my_circle, x, y)
-
-	def down(self, event):
-	    
-		# Déplacement de 10 pixels en bas
-		x = 0
-		y = 10
-		self.my_canvas.move(self.my_circle, x, y)
-
-	def pressing(self, event):
-	   
-		# Déplacement avec les touches 'qsdz'
-		x = 0
-		y = 0
-		if event.char == 'q': x = -10  # déplacement à gauche
-		if event.char == 's': y = 10  # déplacement en bas
-		if event.char == 'd': x = 10  # déplacement à droite
-		if event.char == 'z': y = -10  # déplacement en haut
-		self.my_canvas.move(self.my_circle, x, y)
-
-class Quit:
-	"""La fonction 'quit' permet de quitter l'application
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index008_icon&quit
-	index047_menus&Frame
-	index050_deleteFrameChildrenWidgets
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		my_button = tkinter.Button(root, text="Quitter l'application", command=root.quit)
-		my_button.pack()
-
-class Select:
-	"""La fonction select() permet de sélectionner automatiquement la case / l'onglet
-	du widget concerné et à l'inverse,	la fonction deselect() permet de décocher 
-	automatiquement la case / l'onglet
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index017_checkBoxes
-	index064_noteBook
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		check = tkinter.Checkbutton(root, text="Case déjà cochée !")
-		check.select()
-		check.pack()
-
-class SelectionGet:
-    """La fonction selection_get() permet de sélectionner un texte ou une partie
-    du texte dans le widget text et dans l'exemple ci-dessous, de l'afficher
-	index102_textBoxBoldItalics
-	index107_buildATextEditor et suivants
-	"""
+        if primary_color:
+            
+            # Lignes paires
+            self.my_tree.tag_configure(
+                "evenrow",
+                background=primary_color) 
     
-    def __init__(self, root):
-        self.root = root
-        self.widgets()
+    def secondary_color(self):
+        "Méthode changeant les couleurs secondaires du widget Treeview"
         
-    def widgets(self):
+        # Ouverture de la fenêture du choix des couleurs
+        secondary_color = colorchooser.askcolor()[1]
         
-        self.my_text = tkinter.Text(root, width=40, height=5,)
-        self.my_text.pack()
-        
-        my_button = tkinter.Button(root, text="Sélectionner", command=self.select_it)
-        my_button.pack()
-        
-        self.my_label = tkinter.Label(root, text="")
-        self.my_label.pack()
-        
-    def select_it(self):
-        "Méthode affichant le texte sélectionné dans le widget Text"
-        
-        my_select = self.my_text.selection_get()
-        self.my_label.config(text=my_select)
-
-class Set:
-	"""La fonction set() permet de modifier le texte affiché en recourant aux variables de contrôles
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index012_radioButton
-	index018_optionMenu
-	index045_bindComboBox&OptionMenu
-	index130_spinboxReset
-	"""
-
-	def __init__(self, root):
-		self.root = root
-		self.widgets()
-
-	def widgets(self):
-		
-		self.my_labelVar = tkinter.StringVar()  # variables de contrôles
-		self.my_labelVar.set("Ce texte ne sera jamais modifié !")
-		my_label = tkinter.Label(root, textvariable=self.my_labelVar)
-		my_label.pack()
-
-		my_button = tkinter.Button(root, text="Modifier ce maudit texte !", command=self.update)
-		my_button.pack()
-
-	def update(self):
-
-		self.my_labelVar.set("Le texte a été modifié !!!")
-
-class Tag:
-    """La fonction tag() permet de modifier la mise en forme de la police d'écriture
-    dans le widget Text
-	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
-	index102_textBoxBoldItalics
-	index103_textBoxUndoRedoTitle
-	index109_buildATextEditor et suivants
-	"""
+        if secondary_color:
+            
+            # Lignes impaires
+            self.my_tree.tag_configure(
+                "oddrow", 
+                background=secondary_color) 
     
-    def __init__(self, root):
-        self.root = root
-        self.widgets()
+    def highlight_color(self):
+        "Méthode changeant la ligne sélectionnée du widget Treeview"
         
-    def widgets(self):
+        # Ouverture de la fenêture du choix des couleurs
+        highlight_color = colorchooser.askcolor()[1]
         
-        self.my_text = tkinter.Text(root, width=40, 
-                                    height=5, 
-                                    font="Helvetica 20",
-                                    selectbackground='blue')
-        self.my_text.grid(row=0, column=0, columnspan=2)
+        if highlight_color:
         
-        my_button_bold = tkinter.Button(root, text="Gras", command=self.bold_it)
-        my_button_bold.grid(row=1, column=0)
-        
-        my_button_italic = tkinter.Button(root, text="Italique", command=self.italic_it)
-        my_button_italic.grid(row=1, column=1)  
-        
-    def bold_it(self):
-        "Police d'écriture en gras"
-        
-        # Récupération de la police d'écriture
-        bold_font = font.Font(self.my_text, self.my_text.cget('font'))  
-        
-        # Configuration pour la mise en gras de l'écriture
-        bold_font.config(weight='bold') 
-        self.my_text.tag_config('bold', font=bold_font)
-        
-        # Caractères sélectionnés
-        current_tags = self.my_text.tag_names('sel.first')
-        if 'bold' in current_tags:
-            """Si le texte est déjà en gras... 
-            supprimer cette mise en forme"""
-            self.my_text.tag_remove('bold', 'sel.first', 'sel.last')
-        else:
-            """sinon ajouter cette mise en forme"""
-            self.my_text.tag_add('bold', 'sel.first', 'sel.last')   
-    
-    def italic_it(self):
-        "Police d'écriture en italique"
-        
-        # Récupération de la police d'écriture
-        italic_font = font.Font(self.my_text, self.my_text.cget('font'))  
-        
-        # Configuration pour la mise en gras de l'écriture
-        italic_font.config(slant='italic') 
-        self.my_text.tag_config('italic', font=italic_font)
-        
-        # Caractères sélectionnés
-        current_tags = self.my_text.tag_names('sel.first')
-        if 'italic' in current_tags:
-            """Si le texte est déjà en italique... 
-            supprimer cette mise en forme"""
-            self.my_text.tag_remove('italic', 'sel.first', 'sel.last')
-        else:
-            """sinon ajouter cette mise en forme"""
-            self.my_text.tag_add('italic', 'sel.first', 'sel.last') 
+            # Changement de couleur à la sélection
+            self.style.map('Treeview',
+                background=[('selected', highlight_color)])
 
-if __name__ == '__main__':
-	root = tkinter.Tk()
-	# add = Add(root)
-	# after = After(root)
-	# bind = Bind(root)
-	# clipboard = ClipBoard(root)
-	# config = Config(root)
-	# current = Current(root)
-	# curselection = Curselection(root)
-	# delete = Delete(root)
-	# destroy = Destroy(root)
-	# focus = Focus(root)
-	# forget = Forget(root)
-	# get = Get(root)
-	# hide = Hide(root)
-	# insert = Insert(root)
-	# move = Move(root)
-	# quit = Quit(root)
-	# select = Select(root)
-	# selection_get = SelectionGet(root)
-	# set = Set(root)
-	# tag = Tag(root)
-	root.mainloop()
+    def lookup_records(self):
+        """Méthode permettant de recherche un nom"""
+        
+        # Nouvelle fenêtre
+        self.search = tkinter.Toplevel(root)
+        self.search.title("Recherche de nom")
+        self.search.geometry('400x200')
+        
+        # Cadre
+        search_frame = tkinter.LabelFrame(self.search, text='Nom de famille')
+        search_frame.pack(padx=10, pady=10)
+        
+        # Saisie de données
+        self.search_entry = tkinter.Entry(
+            search_frame, 
+            justify='center', 
+            font='Helvetica 18')
+        self.search_entry.pack(padx=20, pady=20)
+        
+        # Bouton d'exécution
+        search_button = tkinter.Button(
+            self.search,
+            text='Rechercher les enregistrements',
+            command=self.search_records
+        )
+        search_button.pack(padx=20, pady=20)
+    
+    def search_records(self):
+        """Méthode permettant de lister le nom recherché"""
+        
+        # Récupération du nom recherché dans la ligne de saisie
+        self.lookup_records = self.search_entry.get()
+        
+        # Fermeture de la fenêtre de recherche
+        self.search.destroy()
+        
+        # Effacement des données dans le widget treeview
+        for record in self.my_tree.get_children():
+            self.my_tree.delete(record)
+            
+         # Création d'une base de donnée 
+        # ou connection à cette base de donnée
+        self.conn = sqlite3.connect('database/tree_crm.db')
+
+        # création d'une instance de curseur
+        c = self.conn.cursor()
+
+        """Exécution de la base de données en recourant 
+        à la génération d'une clé primaire avec 'rowid'
+        (langage SQL)
+        Au lieu du signe '=' on le remplace par 'like'
+        car on recherche aussi bien des mots avec des majuscules
+        que des mots avec des minuscules"""
+        c.execute(
+            "SELECT rowid, * FROM customers WHERE nom like ?",
+            (self.lookup_records,) )
+        records = c.fetchall()
+
+        # for record in records:
+        # 	print(record)
+
+        # Ajout des données à l'écran
+        count = 0
+        for record in records:
+            if count % 2 == 0:
+                # Rectification des colonnes 
+                # à prendre en compte !!!
+                self.my_tree.insert(
+                    parent='', 
+                    index='end', 
+                    iid=count, 
+                    text='', 
+                	values=(
+                     record[1], 
+                     record[2], 
+                     record[0], 
+                     record[4],
+                     record[5], 
+                     record[6], 
+                     record[7]),
+                	tags=('evenrow',))
+            else:
+                self.my_tree.insert(
+                    parent='', 
+                    index='end',
+                    iid=count, 
+                    text='', 
+                	values=(
+                     record[1], 
+                     record[2], 
+                     record[0], 
+                     record[4], 
+                     record[5], 
+                     record[6], 
+                     record[7]),
+                	tags=('oddrow',))
+            count +=1
+
+        # Commit
+        self.conn.commit()
+
+        # Arrêt de la connection
+        self.conn.close()
+    
+    def update_record(self):
+        " Méthode permettant de modifier la donnée enregistrée"
+
+        # Récupération de la donnée enregistrée
+        selected = self.my_tree.focus()
+        self.my_tree.item(
+            selected, 
+            text="", 
+            values=(
+                self.fn_entry.get(), 
+                self.ln_entry.get(), 
+                self.id_entry.get(),
+                self.address_entry.get(), 
+                self.city_entry.get(), 
+                self.state_entry.get(), 
+                self.zipcode_entry.get()))
+
+        # Accès à la base de données
+        self.conn = sqlite3.connect('database/tree_crm.db')
+        c = self.conn.cursor()
+
+        # Mise à jour de la base de données (langage SQL)
+        c.execute("""UPDATE customers SET 
+        	Prenom = :prenom, 
+        	Nom = :nom, 
+        	Adresse = :adresse, 
+        	Ville = :ville, 
+        	Departement = :departement, 
+        	CP = :cp 
+        	WHERE oid = :oid""",
+        	{
+        	'prenom': self.fn_entry.get(),
+        	'nom': self.ln_entry.get(),
+        	'adresse': self.address_entry.get(),
+        	'ville': self.city_entry.get(),
+        	'departement': self.state_entry.get(),
+        	'cp': self.zipcode_entry.get(),
+        	'oid': self.id_entry.get(),
+        	})
+
+        # Commit & arrêt de la connection
+        self.conn.commit()
+        self.conn.close()
+
+        # Effacement des données
+        self.fn_entry.delete(0, 'end')
+        self.ln_entry.delete(0, 'end')
+        self.id_entry.delete(0, 'end')
+        self.address_entry.delete(0, 'end')
+        self.city_entry.delete(0, 'end')
+        self.state_entry.delete(0, 'end')
+        self.zipcode_entry.delete(0, 'end')
+
+    def add_record(self):
+        " Méthode permettant d'ajouter les données dans le SGBD"
+
+        # Création d'une base de donnée ou connection 
+        # à cette base de donnée
+        self.conn = sqlite3.connect('database/tree_crm.db')
+
+        # Création d'une instance de curseur
+        c = self.conn.cursor()
+
+        # Ajouter une nouvelle donnée (langage SQL)
+        c.execute(
+            "INSERT INTO customers VALUES (:prenom, :nom, :id, :adresse, :ville, :departement, :cp)",
+        	{
+        	'prenom': self.fn_entry.get(),
+        	'nom': self.ln_entry.get(),
+        	'id': self.id_entry.get(),
+        	'adresse': self.address_entry.get(),
+        	'ville': self.city_entry.get(),
+        	'departement': self.state_entry.get(),
+        	'cp': self.zipcode_entry.get(),
+        	})
+
+        # Commit
+        self.conn.commit()
+
+        # Arrêt de la connection
+        self.conn.close()
+
+        # Effacement des données
+        self.fn_entry.delete(0, 'end')
+        self.ln_entry.delete(0, 'end')
+        self.id_entry.delete(0, 'end')
+        self.address_entry.delete(0, 'end')
+        self.city_entry.delete(0, 'end')
+        self.state_entry.delete(0, 'end')
+        self.zipcode_entry.delete(0, 'end')
+
+        # Effacement de la table d'arborescence
+        self.my_tree.delete(*self.my_tree.get_children())
+        # Équivaut aux instructions dans la méthode remove_all()
+
+        # Récupération des données dans le SGBD
+        self.query_database()
+
+    def remove_all(self):
+        "Méthode permettant d'effacer toutes les données enregistrées"
+
+        # Message d'information
+        response = messagebox.askyesno("Attention !!!",
+        "Tout va être supprimé dans la base de données !\nEtes-vous suicidaire ?")
+        
+        # Si suite au message d'information ci-dessus 
+        # on clique sur "OUI"
+        if response == 1:
+
+            # Effacement des données dans le widget treeview
+            for record in self.my_tree.get_children():
+        	    self.my_tree.delete(record)
+ 
+            # Création d'une base de donnée ou connection 
+            # à cette base de donnée
+            self.conn = sqlite3.connect('database/tree_crm.db')
+
+            # Création d'une instance de curseur
+            c = self.conn.cursor()
+
+            # Suppression de toutes les données 
+            # dans le SGBD (langage SQL)
+            c.execute("DROP TABLE customers")
+
+            # Commit
+            self.conn.commit()
+
+            # Arrêt de la connection
+            self.conn.close()
+
+            # Effacement des données (voir méthode ci-après) 
+            self.clear_entries()
+        
+            # Création d'une nouvelle table (voir méthode ci-avant)
+            self.database()
+
+    def remove_one(self):
+        "Méthode permettant de supprimer une donnée enregistrée"
+
+        x = self.my_tree.selection()[0]
+        self.my_tree.delete(x)
+
+        # Connection à cette base de donnée
+        self.conn = sqlite3.connect('database/tree_crm.db')
+
+        # Création d'une instance de curseur
+        c = self.conn.cursor()
+
+        # Suppression à partir de la base de données (langage SQL)
+        c.execute("DELETE from customers WHERE oid=" + 
+                  self.id_entry.get())
+
+        # Commit
+        self.conn.commit()
+
+        # Arrêt de la connection
+        self.conn.close()
+
+        # Effacement de l'enregisrement affiché
+        self.clear_entries()
+
+        # Message d'information
+        messagebox.showinfo("Delete!", "Cette donnée est supprimée !")
+
+    def remove_many(self):
+        "Méthode permettant d'effacer plusieurs données enregistrées"
+
+        # Message d'information
+        response = messagebox.askyesno("Attention !!!",
+        "Les données sélectionnées vont être supprimées !\nEtes-vous sûr ?")
+        
+        # Si suite au message d'information ci-dessus 
+        # on clique sur "OUI"
+        if response == 1:
+            
+            # Sélection des données à supprimer
+            x = self.my_tree.selection()
+            
+            # Assignation d'une liste pour le champ 'ID'
+            ids_to_delete = []
+            
+            # Pour chaque donnée sélectionnée
+            for record in x :
+                # Affichage du champ 'ID' de la donnée sélectionnée
+                # print(self.my_tree.item(record, 'values')[2])
+                # Ajout de la donnée du champ 'ID' dans la liste
+                ids_to_delete.append(
+                    self.my_tree.item(record, 'values')[2])     
+            
+            # Suppression des données dans le widget treeview
+            for record in x:
+                self.my_tree.delete(record)
+            
+            # Connection à cette base de donnée
+            self.conn = sqlite3.connect('database/tree_crm.db')
+
+            # Création d'une instance de curseur
+            c = self.conn.cursor()
+
+            # Suppression à partir de la base de données 
+            # (langage SQL)
+            c.executemany("DELETE from customers WHERE id = ?",
+                          [(a,) for a in ids_to_delete])
+            """Pour l'instruction ci-dessus :
+            [(a,) for a in ids_to_delete])
+            voir le commentaire en début de ce script"""
+
+            # Commit
+            self.conn.commit()
+
+            # Arrêt de la connection
+            self.conn.close()
+
+            # Effacement de l'enregisrement affiché
+            # self.clear_entries()
+
+    def up(self):
+        """Méthode permettant de remonter l'enregistrement 
+        parmis les données enregistrées"""
+
+        rows = self.my_tree.selection()
+        for row in rows:
+        	self.my_tree.move(
+             row, 
+             self.my_tree.parent(row), 
+             self.my_tree.index(row)-1)
+
+    def down(self):
+        """Mthode permettant de descendre l'enregistrement 
+        parmis les données enregistrées"""
+
+        rows = self.my_tree.selection()
+        for row in reversed(rows):
+        	self.my_tree.move(
+             row, 
+             self.my_tree.parent(row), 
+             self.my_tree.index(row)+1)
+
+    def clear_entries(self):
+        """Méthode permettant d'effacer l'enregistrement affiché"""
+
+        # Effacement des données
+        self.fn_entry.delete(0, 'end')
+        self.ln_entry.delete(0, 'end')
+        self.id_entry.delete(0, 'end')
+        self.address_entry.delete(0, 'end')
+        self.city_entry.delete(0, 'end')
+        self.state_entry.delete(0, 'end')
+        self.zipcode_entry.delete(0, 'end')
+
+    def select_record(self, e):
+        """Méthode permettant d'afficher l'enregistrement 
+        sélectionné : lien avec la souris -> instruction bind utilisée"""
+
+        # Effacement des données
+        self.fn_entry.delete(0, 'end')
+        self.ln_entry.delete(0, 'end')
+        self.id_entry.delete(0, 'end')
+        self.address_entry.delete(0, 'end')
+        self.city_entry.delete(0, 'end')
+        self.state_entry.delete(0, 'end')
+        self.zipcode_entry.delete(0, 'end')
+
+        # Sélection des enregistrements
+        selected = self.my_tree.focus()
+
+        # Récupération de l'enregistrement sélectionnée
+        values = self.my_tree.item(selected, 'values')
+
+        # Affichage des données
+        self.fn_entry.insert(0, values[0])
+        self.ln_entry.insert(0, values[1])
+        self.id_entry.insert(0, values[2])
+        self.address_entry.insert(0, values[3])
+        self.city_entry.insert(0, values[4])
+        self.state_entry.insert(0, values[5])
+        self.zipcode_entry.insert(0, values[6])
+
+    def query_database(self):
+        "Méthode permettant de lancer la base de données"
+
+        # Effacement des données dans le widget treeview
+        for record in self.my_tree.get_children():
+            self.my_tree.delete(record)
+        
+        # Création d'une base de donnée 
+        # ou connection à cette base de donnée
+        self.conn = sqlite3.connect('database/tree_crm.db')
+
+        # création d'une instance de curseur
+        c = self.conn.cursor()
+
+        # Exécution de la base de données en recourant 
+        # à la génération d'une clé primaire avec 'rowid'
+        # (langage SQL)
+        c.execute("SELECT rowid, * FROM customers")
+        records = c.fetchall()
+
+        # for record in records:
+        # 	print(record)
+
+        # Ajout des données à l'écran
+        count = 0
+        for record in records:
+            if count % 2 == 0:
+                # Rectification des colonnes 
+                # à prendre en compte !!!
+                self.my_tree.insert(
+                    parent='', 
+                    index='end', 
+                    iid=count, 
+                    text='', 
+                	values=(
+                     record[1], 
+                     record[2], 
+                     record[0], 
+                     record[4],
+                     record[5], 
+                     record[6], 
+                     record[7]),
+                	tags=('evenrow',))
+            else:
+                self.my_tree.insert(
+                    parent='', 
+                    index='end',
+                    iid=count, 
+                    text='', 
+                	values=(
+                     record[1], 
+                     record[2], 
+                     record[0], 
+                     record[4], 
+                     record[5], 
+                     record[6], 
+                     record[7]),
+                	tags=('oddrow',))
+            count +=1
+
+        # Commit
+        self.conn.commit()
+
+        # Arrêt de la connection
+        self.conn.close()
+
+if __name__ == "__main__":
+    root = tkinter.Tk()
+    gui = GUI(root)
+    root.mainloop()
