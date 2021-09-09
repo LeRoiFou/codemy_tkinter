@@ -99,6 +99,7 @@ class Bind:
 	index137_menuPopupsBind
 	index149_canvasEntryBoxes
 	index162_search
+	index188_CustomTitlebar
 	"""
 
 	def __init__(self, root):
@@ -327,6 +328,8 @@ class Delete:
 	index170_passwordGenerator
 	index171_currencyConverter
 	index182_CRM
+	index189_KeyGenerator 
+ 	et suivants...
 	"""
 
 	def __init__(self, root):
@@ -397,7 +400,7 @@ class Focus:
 		self.my_entry.pack()
 
 class Forget:
-	"""La fonction forget() permet de faire disparaître un wiget
+	"""La fonction forget() permet de faire disparaître un widget
 	Fonction retrouvée dans les cours suivants dans codemy_tkinter :
 	index041_removeLabels
 	index042_overwriteLabels
@@ -564,6 +567,8 @@ class Insert:
 	index170_passwordGenerator
 	index171_currencyConverter
 	index182_CRM
+	index189_KeyGenerator
+	et suivants...
 	"""
 
 	def __init__(self, root):
